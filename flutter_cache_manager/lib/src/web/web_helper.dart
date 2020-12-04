@@ -111,11 +111,13 @@ class WebHelper {
     final hasNewFile = statusCodesNewFile.contains(response.statusCode);
     final keepOldFile = statusCodesFileNotChanged.contains(response.statusCode);
     if (!hasNewFile && !keepOldFile) {
-      throw HttpExceptionWithStatus(
+      // NOTE: do not throw exception, just ignore
+      return;
+      /*throw HttpExceptionWithStatus(
         response.statusCode,
         'Invalid statusCode: ${response?.statusCode}',
         uri: Uri.parse(cacheObject.url),
-      );
+      );*/
     }
 
     final oldCacheObject = cacheObject;
