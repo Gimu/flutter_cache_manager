@@ -1,3 +1,37 @@
+## [3.0.2] - 2021-05-10
+* Include rxdart 0.27 as possible dependency
+
+## [3.0.1] - 2021-03-29
+* Include file 6.0.0 as possible dependency
+
+## [3.0.0] - 2021-03-27
+* Bug fix on removing a relatively new file from cache
+* Migration to nullsafety.
+
+## [3.0.0-nullsafety.3] - 2021-03-26
+* Add null-check on id in removeFile
+
+## [3.0.0-nullsafety.2] - 2021-03-22
+* Fix sqflite warning
+
+## [3.0.0-nullsafety.1] - 2021-03-02
+* Bug fix for NonStoringObjectProvider.
+
+## [3.0.0-nullsafety.0] - 2021-02-25
+* Migration to nullsafety.
+
+## [2.1.2] - 2021-03-09
+* Update dependencies
+* Bug fix for JsonCacheInfoRepository when file is corrupted.
+
+## [2.1.1] - 2021-01-14
+* Update minimal dependency sqflite
+* Small fix for non-existing directory (PR [#264](https://github.com/Baseflow/flutter_cache_manager/pull/264))
+
+## [2.1.0] - 2020-12-21
+* Added ImageCacheManager with support for image resizing.
+* Upgrade dependencies.
+
 ## [2.0.0] - 2020-10-16
 * Restructured the configuration of the CacheManager. Look at the ReadMe for more information.
 * Added queueing mechanism for downloading new files. By default, the cache manager downloads a maximum of 10 files

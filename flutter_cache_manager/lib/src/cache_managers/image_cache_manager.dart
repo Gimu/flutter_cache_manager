@@ -6,7 +6,6 @@ import 'package:image/image.dart';
 
 const supportedFileNames = ['jpg', 'jpeg', 'png', 'tga', 'gif', 'cur', 'ico'];
 mixin ImageCacheManager on BaseCacheManager {
-
   /// Returns a resized image file to fit within maxHeight and maxWidth. It
   /// tries to keep the aspect ratio. It stores the resized image by adding
   /// the size to the key or url. For example when resizing
@@ -18,11 +17,11 @@ mixin ImageCacheManager on BaseCacheManager {
   /// and returned to the caller.
   Stream<FileResponse> getImageFile(
     String url, {
-    String key,
-    Map<String, String> headers,
-    bool withProgress,
-    int maxHeight,
-    int maxWidth,
+    String? key,
+    Map<String, String>? headers,
+    bool withProgress = false,
+    int? maxHeight,
+    int? maxWidth,
   }) async* {
     if (maxHeight == null && maxWidth == null) {
       yield* getFileStream(url,
@@ -43,8 +42,9 @@ mixin ImageCacheManager on BaseCacheManager {
       }
       withProgress = false;
     }
-    if (!_runningResizes.containsKey(resizedKey)) {
-      _runningResizes[resizedKey] = _fetchedResizedFile(
+    var runningResize = _runningResizes[resizedKey];
+    if (runningResize == null) {
+      runningResize = _fetchedResizedFile(
         url,
         key,
         resizedKey,
@@ -53,28 +53,29 @@ mixin ImageCacheManager on BaseCacheManager {
         maxWidth: maxWidth,
         maxHeight: maxHeight,
       );
+      _runningResizes[resizedKey] = runningResize;
     }
-    yield* _runningResizes[resizedKey];
+    yield* runningResize;
     _runningResizes.remove(resizedKey);
   }
 
   final Map<String, Stream<FileResponse>> _runningResizes = {};
   Future<FileInfo> _resizeImageFile(
-      FileInfo originalFile,
-      String key,
-      int maxWidth,
-      int maxHeight,
-      ) async {
+    FileInfo originalFile,
+    String key,
+    int? maxWidth,
+    int? maxHeight,
+  ) async {
     var originalFileName = originalFile.file.path;
     var fileExtension = originalFileName.split('.').last;
-    if(!supportedFileNames.contains(fileExtension)){
+    if (!supportedFileNames.contains(fileExtension)) {
       return originalFile;
     }
 
-    var image = decodeImage(await originalFile.file.readAsBytes());
+    var image = decodeImage(await originalFile.file.readAsBytes())!;
     if (maxWidth != null && maxHeight != null) {
-      var resizeFactorWidth = image.width/maxWidth;
-      var resizeFactorHeight = image.height/maxHeight;
+      var resizeFactorWidth = image.width / maxWidth;
+      var resizeFactorHeight = image.height / maxHeight;
       var resizeFactor = max(resizeFactorHeight, resizeFactorWidth);
 
       maxWidth = (image.width / resizeFactor).round();
@@ -82,7 +83,7 @@ mixin ImageCacheManager on BaseCacheManager {
     }
 
     var resized = copyResize(image, width: maxWidth, height: maxHeight);
-    var resizedFile = encodeNamedImage(resized, originalFileName);
+    var resizedFile = encodeNamedImage(resized, originalFileName)!;
     var maxAge = originalFile.validTill.difference(DateTime.now());
 
     var file = await putFile(
@@ -102,14 +103,14 @@ mixin ImageCacheManager on BaseCacheManager {
   }
 
   Stream<FileResponse> _fetchedResizedFile(
-      String url,
-      String originalKey,
-      String resizedKey,
-      Map<String, String> headers,
-      bool withProgress, {
-        int maxWidth,
-        int maxHeight,
-      }) async* {
+    String url,
+    String originalKey,
+    String resizedKey,
+    Map<String, String>? headers,
+    bool withProgress, {
+    int? maxWidth,
+    int? maxHeight,
+  }) async* {
     await for (var response in getFileStream(
       url,
       key: originalKey,
@@ -129,5 +130,4 @@ mixin ImageCacheManager on BaseCacheManager {
       }
     }
   }
-
 }
